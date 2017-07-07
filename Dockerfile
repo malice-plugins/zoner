@@ -7,7 +7,7 @@ LABEL malice.plugin.category="av"
 LABEL malice.plugin.mime="*"
 LABEL malice.plugin.docker.engine="*"
 
-ARG ZONEKEY
+ARG ZONEKEY=${ZONEKEY}
 ENV ZONE 1.3.0
 
 RUN buildDeps='ca-certificates wget build-essential' \
