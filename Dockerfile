@@ -19,7 +19,7 @@ RUN buildDeps='ca-certificates wget build-essential' \
   if [ "x$ZONE_KEY" != "x" ]; then \
       echo "===> Updating License Key..."; \
       sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONE_KEY}/g" /etc/zav/zavd.conf; \
-  fi; \
+  fi \
   && echo "===> Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
