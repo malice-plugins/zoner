@@ -21,11 +21,11 @@ Content-Type: application/json; charset=UTF-8
 Date: Sat, 21 Jan 2017 05:39:29 GMT
 
 {
-  "bitdefender": {
+  "zoner": {
     "infected": true,
-    "result": "EICAR-Test-File (not a virus)",
-    "engine": "7.90123",
-    "updated": "20170122"
+    "result": "EICAR.Test.File-NoVirus",
+    "engine": "1979756",
+    "updated": "20170707"
   }
 }
 ```

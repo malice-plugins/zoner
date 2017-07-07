@@ -65,9 +65,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 {
   "zoner": {
     "infected": true,
-    "result": "EICAR-Test-File (not a virus)",
-    "engine": "7.90123",
-    "updated": "20170122"
+    "result": "EICAR.Test.File-NoVirus",
+    "engine": "1979756",
+    "updated": "20170707"
   }
 }
 ```
@@ -77,10 +77,9 @@ This will output to stdout and POST to malice results API webhook endpoint.
 ---
 
 #### Zoner
-
-| Infected | Result                        | Engine  | Updated  |
-| -------- | ----------------------------- | ------- | -------- |
-| true     | EICAR-Test-File (not a virus) | 7.90123 | 20170122 |
+| Infected      | Result      | Engine      | Updated      |
+|:-------------:|:-----------:|:-----------:|:------------:|
+| true | EICAR.Test.File-NoVirus | 1979756 | 20170707 |
 
 ---
 
