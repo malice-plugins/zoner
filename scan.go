@@ -53,11 +53,12 @@ type ResultsData struct {
 	Engine   string `json:"engine" structs:"engine"`
 	Updated  string `json:"updated" structs:"updated"`
 	MarkDown string `json:"markdown,omitempty" structs:"markdown,omitempty"`
+	Error    string `json:"error,omitempty" structs:"error,omitempty"`
 }
 
 func assert(err error) {
 	if err != nil {
-		// AVG exits with error status 5 if it finds a virus
+		// Zoner exits with error status 5 if it finds a virus
 		if err.Error() != "exit status 1" {
 			log.WithFields(log.Fields{
 				"plugin":   name,
@@ -68,13 +69,22 @@ func assert(err error) {
 	}
 }
 
+func startZavService(ctx context.Context) error {
+	// Zoner needs to have the daemon started first
+	_, err := utils.RunCommand(ctx, "/etc/init.d/zavd", "start", "--no-daemon")
+	return err
+}
+
 // AvScan performs antivirus scan
 func AvScan(timeout int) Zoner {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 
-	results, err := utils.RunCommand(ctx, "bdscan", path)
+	// start service
+	assert(startZavService(ctx))
+
+	results, err := utils.RunCommand(ctx, "zavcli", path)
 	log.WithFields(log.Fields{
 		"plugin":   name,
 		"category": category,
@@ -83,7 +93,7 @@ func AvScan(timeout int) Zoner {
 	assert(err)
 
 	return Zoner{
-		Results: ParseZonerOutput(results, nil),
+		Results: ParseZonerOutput(results, err),
 	}
 }
 
@@ -91,54 +101,23 @@ func AvScan(timeout int) Zoner {
 func ParseZonerOutput(zonerout string, err error) ResultsData {
 
 	if err != nil {
-		return ResultsData{}
+		return ResultsData{Error: err.Error()}
 	}
 
 	zoner := ResultsData{Infected: false}
-	// EXAMPLE OUTPUT:
-	// BitDefender Antivirus Scanner for Unices v7.90123 Linux-amd64
-	// Copyright (C) 1996-2009 BitDefender. All rights reserved.
-	// Trial key found. 30 days remaining.
-	//
-	// Infected file action: ignore
-	// Suspected file action: ignore
-	// Loading plugins, please wait
-	// Plugins loaded.
-	//
-	// /malware/EICAR  infected: EICAR-Test-File (not a virus)
-	//
-	//
-	// Results:
-	// Folders: 0
-	// Files: 1
-	// Packed: 0
-	// Archives: 0
-	// Infected files: 1
-	// Suspect files: 0
-	// Warnings: 0
-	// Identified viruses: 1
-	// I/O errors: 0
+
 	lines := strings.Split(zonerout, "\n")
 
 	// Extract Virus string
 	for _, line := range lines {
 		if len(line) != 0 {
-			switch {
-			case strings.Contains(line, "infected:"):
+			if strings.Contains(line, "INFECTED") {
 				result := extractVirusName(line)
 				if len(result) != 0 {
 					zoner.Result = result
 					zoner.Infected = true
 				} else {
-					fmt.Println("[ERROR] Virus name extracted was empty: ", result)
-					os.Exit(2)
-				}
-			case strings.Contains(line, "Unices v"):
-				words := strings.Fields(line)
-				for _, word := range words {
-					if strings.HasPrefix(word, "v") {
-						zoner.Engine = strings.TrimPrefix(word, "v")
-					}
+					return ResultsData{Error: fmt.Sprint("[ERROR] virus name extracted was empty: ", result)}
 				}
 			}
 		}
@@ -151,7 +130,7 @@ func ParseZonerOutput(zonerout string, err error) ResultsData {
 
 // extractVirusName extracts Virus name from scan results string
 func extractVirusName(line string) string {
-	keyvalue := strings.Split(line, "infected:")
+	keyvalue := strings.Split(line, "INFECTED")
 	return strings.TrimSpace(keyvalue[1])
 }
 
@@ -166,25 +145,27 @@ func getUpdatedDate() string {
 
 func updateAV(ctx context.Context) error {
 	fmt.Println("Updating Zoner...")
-	output, err := utils.RunCommand(ctx, "bdscan", "--update")
+	// Zoner needs to have the daemon started first
+	output, err := utils.RunCommand(nil, "/etc/init.d/zavd", "update")
 	log.WithFields(log.Fields{
 		"plugin":   name,
 		"category": category,
 		"path":     path,
 	}).Debug("Zoner update: ", output)
 	assert(err)
+
 	// Update UPDATED file
 	t := time.Now().Format("20060102")
 	err = ioutil.WriteFile("/opt/malice/UPDATED", []byte(t), 0644)
 	return err
 }
 
-func generateMarkDownTable(b Zoner) string {
+func generateMarkDownTable(z Zoner) string {
 	var tplOut bytes.Buffer
 
-	t := template.Must(template.New("bit").Parse(tpl))
+	t := template.Must(template.New("").Parse(tpl))
 
-	err := t.Execute(&tplOut, b)
+	err := t.Execute(&tplOut, z)
 	if err != nil {
 		log.Println("executing template:", err)
 	}
