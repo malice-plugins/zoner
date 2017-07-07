@@ -7,7 +7,7 @@ LABEL malice.plugin.category="av"
 LABEL malice.plugin.mime="*"
 LABEL malice.plugin.docker.engine="*"
 
-ARG ZONEKEY=${ZONEKEY}
+ARG BUILD_KEY
 ENV ZONE 1.3.0
 
 RUN buildDeps='ca-certificates wget build-essential' \
@@ -15,8 +15,15 @@ RUN buildDeps='ca-certificates wget build-essential' \
   && apt-get install -yq $buildDeps libc6-i386 \
   && echo "===> Install Zoner AV..." \
   && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
-  && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb \
-  && sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONEKEY}/g" /etc/zav/zavd.conf \
+  && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb; \
+  if [ "x$BUILD_KEY" != "x" ]; then \
+      echo "===> Updating License Key..."; \
+      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${BUILD_KEY}/g" /etc/zav/zavd.conf; \
+  fi; \
+  if [ "x$ZONEKEY" != "x" ]; then \
+      echo "===> Updating License Key..."; \
+      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONEKEY}/g" /etc/zav/zavd.conf; \
+  fi \
   && echo "===> Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
@@ -51,8 +58,10 @@ RUN buildDeps='ca-certificates \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
-# Update zoner definitions
-RUN /etc/init.d/zavd update
+RUN echo "===> Update zoner definitions..."; \
+  if [ "x$BUILD_KEY" != "x" ] || [ "x$ZONEKEY" != "x" ]; then \
+      /etc/init.d/zavd update; \
+  fi
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
