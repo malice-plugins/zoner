@@ -10,7 +10,7 @@ Malice [Zoner](http://www.zonerantivirus.com/stahnout) AntiVirus Plugin
 
 ### Dependencies
 
--	[debian:jessie (*123 MB*\)](https://hub.docker.com/_/debian/)
+-	[ubuntu:xenial(*118 MB*\)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
 

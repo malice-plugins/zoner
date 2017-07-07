@@ -1,4 +1,4 @@
-FROM ubuntu:precise
+FROM ubuntu:xenial
 
 LABEL maintainer "https://github.com/blacktop"
 
@@ -10,7 +10,6 @@ LABEL malice.plugin.docker.engine="*"
 ARG ZONEKEY
 ENV ZONE 1.3.0
 
-COPY zoner.key /tmp/zoner.key
 RUN buildDeps='ca-certificates wget build-essential' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 \
