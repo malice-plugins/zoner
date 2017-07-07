@@ -58,14 +58,11 @@ type ResultsData struct {
 
 func assert(err error) {
 	if err != nil {
-		// Zoner exits with error status 5 if it finds a virus
-		if err.Error() != "exit status 1" {
-			log.WithFields(log.Fields{
-				"plugin":   name,
-				"category": category,
-				"path":     path,
-			}).Fatal(err)
-		}
+		log.WithFields(log.Fields{
+			"plugin":   name,
+			"category": category,
+			"path":     path,
+		}).Fatal(err)
 	}
 }
 
@@ -90,11 +87,21 @@ func AvScan(timeout int) Zoner {
 		"category": category,
 		"path":     path,
 	}).Debug("Zoner output: ", results)
-	assert(err)
 
-	return Zoner{
-		Results: ParseZonerOutput(results, err),
+	if err != nil {
+		// Zoner exits with error status 11 if it finds a virus
+		if err.Error() != "exit status 11" {
+			log.WithFields(log.Fields{
+				"plugin":   name,
+				"category": category,
+				"path":     path,
+			}).Fatal(err)
+		} else {
+			err = nil
+		}
 	}
+
+	return Zoner{Results: ParseZonerOutput(results, err)}
 }
 
 // ParseZonerOutput convert zoner output into ResultsData struct
@@ -122,7 +129,7 @@ func ParseZonerOutput(zonerout string, err error) ResultsData {
 			}
 		}
 	}
-
+	zoner.Engine = getEngine()
 	zoner.Updated = getUpdatedDate()
 
 	return zoner
@@ -131,7 +138,31 @@ func ParseZonerOutput(zonerout string, err error) ResultsData {
 // extractVirusName extracts Virus name from scan results string
 func extractVirusName(line string) string {
 	keyvalue := strings.Split(line, "INFECTED")
-	return strings.TrimSpace(keyvalue[1])
+	return strings.TrimSpace(strings.Trim(keyvalue[1], "[]"))
+}
+
+func getEngine() string {
+	var engine = ""
+
+	// start service
+	startZavService(context.Background())
+
+	results, err := utils.RunCommand(nil, "zavcli", "--version-zavd")
+	log.WithFields(log.Fields{
+		"plugin":   name,
+		"category": category,
+		"path":     path,
+	}).Debug("Zoner DB version: ", results)
+	assert(err)
+
+	for _, line := range strings.Split(results, "\n") {
+		if len(line) != 0 {
+			if strings.Contains(line, "ZAVDB version:") {
+				engine = strings.TrimSpace(strings.TrimPrefix(line, "ZAVDB version:"))
+			}
+		}
+	}
+	return engine
 }
 
 func getUpdatedDate() string {

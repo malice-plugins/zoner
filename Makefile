@@ -39,9 +39,10 @@ avtest:
 	@echo "===> ${NAME} Version"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version" > tests/av.version || true
 	@echo "===> ${NAME} DB version"
-	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version-zavd " > tests/av.update || true
+	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version-zavd" > tests/av.update || true
 
 test:
+	docker rm -f elasticsearch || true
 	docker run --init -d --name elasticsearch -p 9200:9200 blacktop/elasticsearch
 	sleep 10; docker run --init --rm $(ORG)/$(NAME):$(VERSION)
 	docker run --init --rm --link elasticsearch $(ORG)/$(NAME):$(VERSION) -V EICAR | jq . > docs/results.json

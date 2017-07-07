@@ -1,21 +1,35 @@
 {
-  "error": {
-    "root_cause": [
-      {
-        "type": "index_not_found_exception",
-        "reason": "no such index",
-        "resource.type": "index_or_alias",
-        "resource.id": "malice",
-        "index_uuid": "_na_",
-        "index": "malice"
-      }
-    ],
-    "type": "index_not_found_exception",
-    "reason": "no such index",
-    "resource.type": "index_or_alias",
-    "resource.id": "malice",
-    "index_uuid": "_na_",
-    "index": "malice"
+  "took": 78,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "failed": 0
   },
-  "status": 404
+  "hits": {
+    "total": 1,
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "malice",
+        "_type": "samples",
+        "_id": "AV0ea-MWQIJjg55u5s05",
+        "_score": 1,
+        "_source": {
+          "plugins": {
+            "av": {
+              "zoner": {
+                "engine": "1979756",
+                "infected": true,
+                "markdown": "#### Zoner\n| Infected      | Result      | Engine      | Updated      |\n|:-------------:|:-----------:|:-----------:|:------------:|\n| true | [EICAR.Test.File-NoVirus] | 1979756 | 20170707 |\n",
+                "result": "[EICAR.Test.File-NoVirus]",
+                "updated": "20170707"
+              }
+            }
+          },
+          "scan_date": "2017-07-07T18:59:33.253444774Z"
+        }
+      }
+    ]
+  }
 }
