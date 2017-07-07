@@ -2,18 +2,18 @@ REPO=malice-plugins/zoner
 ORG=malice
 NAME=zoner
 VERSION=$(shell cat VERSION)
-BUILD_KEY?=$(shell cat zoner.key)
+ZONE_KEY?=$(shell cat zoner.key)
 
 all: build size test avtest gotest
 
 build:
-	docker build --build-arg BUILD_KEY=${BUILD_KEY} -t $(ORG)/$(NAME):$(VERSION) .
+	docker build --build-arg ZONE_KEY=${ZONE_KEY} -t $(ORG)/$(NAME):$(VERSION) .
 
 base:
 	docker build -f Dockerfile.base -t $(ORG)/$(NAME):base .
 
 dev:
-	docker build --build-arg BUILD_KEY=${BUILD_KEY} -f Dockerfile.dev -t $(ORG)/$(NAME):$(VERSION) .
+	docker build --build-arg ZONE_KEY=${ZONE_KEY} -f Dockerfile.dev -t $(ORG)/$(NAME):$(VERSION) .
 
 size:
 	sed -i.bu 's/docker%20image-.*-blue/docker%20image-$(shell docker images --format "{{.Size}}" $(ORG)/$(NAME):$(VERSION)| cut -d' ' -f1)-blue/' README.md

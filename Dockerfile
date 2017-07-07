@@ -7,7 +7,7 @@ LABEL malice.plugin.category="av"
 LABEL malice.plugin.mime="*"
 LABEL malice.plugin.docker.engine="*"
 
-ARG BUILD_KEY
+ARG ZONE_KEY
 ENV ZONE 1.3.0
 
 RUN buildDeps='ca-certificates wget build-essential' \
@@ -16,14 +16,10 @@ RUN buildDeps='ca-certificates wget build-essential' \
   && echo "===> Install Zoner AV..." \
   && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
   && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb; \
-  if [ "x$BUILD_KEY" != "x" ]; then \
+  if [ "x$ZONE_KEY" != "x" ]; then \
       echo "===> Updating License Key..."; \
-      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${BUILD_KEY}/g" /etc/zav/zavd.conf; \
+      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONE_KEY}/g" /etc/zav/zavd.conf; \
   fi; \
-  if [ "x$ZONEKEY" != "x" ]; then \
-      echo "===> Updating License Key..."; \
-      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONEKEY}/g" /etc/zav/zavd.conf; \
-  fi \
   && echo "===> Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
@@ -58,8 +54,8 @@ RUN buildDeps='ca-certificates \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
-RUN echo "===> Update zoner definitions..."; \
-  if [ "x$BUILD_KEY" != "x" ] || [ "x$ZONEKEY" != "x" ]; then \
+RUN if [ "x$ZONE_KEY" != "x" ]; then \
+      echo "===> Update zoner definitions..."; \
       /etc/init.d/zavd update; \
   fi
 
