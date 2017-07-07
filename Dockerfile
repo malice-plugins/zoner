@@ -13,12 +13,10 @@ ENV ZONE 1.3.0
 RUN buildDeps='ca-certificates wget build-essential' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 \
-  && set -x \
   && echo "===> Install Zoner AV..." \
   && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
   && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb \
   && sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONEKEY}/g" /etc/zav/zavd.conf \
-  && cat /etc/zav/zavd.conf | grep UPDATE_KEY \
   && echo "===> Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
