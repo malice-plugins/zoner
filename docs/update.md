@@ -1,13 +1,13 @@
 # To update the AV run the following:
 
 ```bash
-$ docker run --name=bitdefender malice/bitdefender update
+$ docker run --name=zoner malice/zoner update
 ```
 
-## Then to use the updated bitdefender container:
+## Then to use the updated zoner container:
 
 ```bash
-$ docker commit bitdefender malice/bitdefender:updated
-$ docker rm bitdefender # clean up updated container
-$ docker run --rm malice/bitdefender:updated EICAR
+$ docker commit zoner malice/zoner:updated
+$ docker rm zoner # clean up updated container
+$ docker run --rm malice/zoner:updated EICAR
 ```

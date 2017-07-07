@@ -1,7 +1,7 @@
-# Create a Bitdefender scan micro-service :new: :construction:
+# Create a Zoner scan micro-service :new: :construction:
 
 ```bash
-$ docker run -d -p 3993:3993 malice/bitdefender web
+$ docker run -d -p 3993:3993 malice/zoner web
 
 INFO[0000] web service listening on port :3993
 ```
