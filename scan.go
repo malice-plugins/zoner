@@ -138,7 +138,7 @@ func ParseZonerOutput(zonerout string, err error) ResultsData {
 // extractVirusName extracts Virus name from scan results string
 func extractVirusName(line string) string {
 	keyvalue := strings.Split(line, "INFECTED")
-	return strings.TrimSpace(strings.Trim(keyvalue[1], "[]"))
+	return strings.Trim(strings.TrimSpace(keyvalue[1]), "[]")
 }
 
 func getEngine() string {

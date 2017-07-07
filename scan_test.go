@@ -9,7 +9,7 @@ import (
 // TestParseResult tests the ParseFSecureOutput function.
 func TestParseResult(t *testing.T) {
 
-	r, err := ioutil.ReadFile("tests/av_scan.out")
+	r, err := ioutil.ReadFile("tests/av.virus")
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -17,7 +17,7 @@ func TestParseResult(t *testing.T) {
 	results := ParseZonerOutput(string(r), nil)
 
 	if true {
-		t.Log("results: ", results)
+		t.Log("results: ", results.Result)
 	}
 
 }

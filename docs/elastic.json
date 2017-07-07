@@ -1,5 +1,5 @@
 {
-  "took": 78,
+  "took": 79,
   "timed_out": false,
   "_shards": {
     "total": 1,
@@ -13,7 +13,7 @@
       {
         "_index": "malice",
         "_type": "samples",
-        "_id": "AV0ea-MWQIJjg55u5s05",
+        "_id": "AV0ef3YDcx8GXzhUSRwe",
         "_score": 1,
         "_source": {
           "plugins": {
@@ -21,13 +21,13 @@
               "zoner": {
                 "engine": "1979756",
                 "infected": true,
-                "markdown": "#### Zoner\n| Infected      | Result      | Engine      | Updated      |\n|:-------------:|:-----------:|:-----------:|:------------:|\n| true | [EICAR.Test.File-NoVirus] | 1979756 | 20170707 |\n",
-                "result": "[EICAR.Test.File-NoVirus]",
+                "markdown": "#### Zoner\n| Infected      | Result      | Engine      | Updated      |\n|:-------------:|:-----------:|:-----------:|:------------:|\n| true | EICAR.Test.File-NoVirus | 1979756 | 20170707 |\n",
+                "result": "EICAR.Test.File-NoVirus",
                 "updated": "20170707"
               }
             }
           },
-          "scan_date": "2017-07-07T18:59:33.253444774Z"
+          "scan_date": "2017-07-07T19:20:56.052116014Z"
         }
       }
     ]
