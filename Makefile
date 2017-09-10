@@ -41,6 +41,9 @@ avtest:
 	@echo "===> ${NAME} DB version"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version-zavd" > tests/av.update || true
 
+update:
+	@docker run  --rm $(ORG)/$(NAME):$(VERSION) update
+
 test:
 	docker rm -f elasticsearch || true
 	docker run --init -d --name elasticsearch -p 9200:9200 blacktop/elasticsearch

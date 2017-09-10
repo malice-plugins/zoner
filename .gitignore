@@ -14,3 +14,4 @@
 .glide/
 *.key
 *.bu
+.circleci/build_num

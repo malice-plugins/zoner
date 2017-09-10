@@ -54,6 +54,7 @@ RUN buildDeps='ca-certificates \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
 
+RUN mkdir -p /opt/malice
 RUN if [ "x$ZONE_KEY" != "x" ]; then \
       echo "===> Update zoner definitions..."; \
       /etc/init.d/zavd update; \
