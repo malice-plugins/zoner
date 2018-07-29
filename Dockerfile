@@ -10,9 +10,9 @@ LABEL malice.plugin.docker.engine="*"
 ARG ZONE_KEY
 ENV ZONE 1.3.0
 
-RUN buildDeps='ca-certificates wget build-essential' \
+RUN buildDeps='wget build-essential' \
   && apt-get update -qq \
-  && apt-get install -yq $buildDeps libc6-i386 \
+  && apt-get install -yq $buildDeps libc6-i386 ca-certificates \
   && echo "===> Install Zoner AV..." \
   && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
   && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb; \
@@ -25,11 +25,16 @@ RUN buildDeps='ca-certificates wget build-essential' \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+RUN mkdir -p /opt/malice
+RUN if [ "x$ZONE_KEY" != "x" ]; then \
+  echo "===> Update zoner definitions..."; \
+  /etc/init.d/zavd update; \
+  fi
+
 ENV GO_VERSION 1.10.3
 
 COPY . /go/src/github.com/malice-plugins/zoner
-RUN buildDeps='ca-certificates \
-  build-essential \
+RUN buildDeps='build-essential \
   gdebi-core \
   libssl-dev \
   mercurial \
@@ -53,12 +58,6 @@ RUN buildDeps='ca-certificates \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /go /usr/local/go
-
-RUN mkdir -p /opt/malice
-RUN if [ "x$ZONE_KEY" != "x" ]; then \
-  echo "===> Update zoner definitions..."; \
-  /etc/init.d/zavd update; \
-  fi
 
 # Add EICAR Test Virus File to malware folder
 ADD http://www.eicar.org/download/eicar.com.txt /malware/EICAR
