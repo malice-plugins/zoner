@@ -8,6 +8,8 @@ LABEL malice.plugin.mime="*"
 LABEL malice.plugin.docker.engine="*"
 
 ARG ZONE_KEY
+ENV ZONE_KEY=$ZONE_KEY
+
 ENV ZONE 1.3.0
 
 RUN buildDeps='wget build-essential' \
