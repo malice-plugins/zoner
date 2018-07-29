@@ -15,3 +15,5 @@
 *.key
 *.bu
 .circleci/build_num
+tests/malware
+tests/not.malware

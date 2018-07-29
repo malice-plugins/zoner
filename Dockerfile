@@ -17,24 +17,24 @@ RUN buildDeps='ca-certificates wget build-essential' \
   && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
   && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb; \
   if [ "x$ZONE_KEY" != "x" ]; then \
-      echo "===> Updating License Key..."; \
-      sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONE_KEY}/g" /etc/zav/zavd.conf; \
+  echo "===> Updating License Key..."; \
+  sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONE_KEY}/g" /etc/zav/zavd.conf; \
   fi \
   && echo "===> Clean up unnecessary files..." \
   && apt-get purge -y --auto-remove $buildDeps \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ENV GO_VERSION 1.8.3
+ENV GO_VERSION 1.10.3
 
 COPY . /go/src/github.com/malice-plugins/zoner
 RUN buildDeps='ca-certificates \
-               build-essential \
-               gdebi-core \
-               libssl-dev \
-               mercurial \
-               git-core \
-               wget' \
+  build-essential \
+  gdebi-core \
+  libssl-dev \
+  mercurial \
+  git-core \
+  wget' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 \
   && set -x \
@@ -56,8 +56,8 @@ RUN buildDeps='ca-certificates \
 
 RUN mkdir -p /opt/malice
 RUN if [ "x$ZONE_KEY" != "x" ]; then \
-      echo "===> Update zoner definitions..."; \
-      /etc/init.d/zavd update; \
+  echo "===> Update zoner definitions..."; \
+  /etc/init.d/zavd update; \
   fi
 
 # Add EICAR Test Virus File to malware folder

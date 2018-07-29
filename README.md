@@ -1,21 +1,21 @@
-malice-zoner
-============
+# zoner
+
 [![Circle CI](https://circleci.com/gh/malice-plugins/zoner.png?style=shield)](https://circleci.com/gh/malice-plugins/zoner)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
 [![Docker Stars](https://img.shields.io/docker/stars/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)
-[![Docker Image](https://img.shields.io/badge/docker%20image-162MB-blue.svg)](https://hub.docker.com/r/malice/zoner/)
+[![Docker Image](https://img.shields.io/badge/docker%20image-151MB-blue.svg)](https://hub.docker.com/r/malice/zoner/)
 
 Malice [Zoner](http://www.zonerantivirus.com/stahnout) AntiVirus Plugin
 
 ### Dependencies
 
--	[ubuntu:xenial (*118 MB*\)](https://hub.docker.com/_/ubuntu/)
+- [ubuntu:xenial (_118 MB_\)](https://hub.docker.com/_/ubuntu/)
 
 ### Installation
 
-1.	Install [Docker](https://www.docker.io/).
-2.	Download [trusted build](https://hub.docker.com/r/malice/zoner/) from public [DockerHub](https://hub.docker.com): `docker pull malice/zoner`
+1.  Install [Docker](https://www.docker.io/).
+2.  Download [trusted build](https://hub.docker.com/r/malice/zoner/) from public [DockerHub](https://hub.docker.com): `docker pull malice/zoner`
 
 ### Usage
 
@@ -42,14 +42,14 @@ Options:
   --table, -t	        output as Markdown table
   --callback, -c	    POST results to Malice webhook [$MALICE_ENDPOINT]
   --proxy, -x	        proxy settings for Malice webhook endpoint [$MALICE_PROXY]
-  --timeout value       malice plugin timeout (in seconds) (default: 60) [$MALICE_TIMEOUT]    
-  --elasitcsearch value elasitcsearch address for Malice to store results [$MALICE_ELASTICSEARCH]   
+  --timeout value       malice plugin timeout (in seconds) (default: 60) [$MALICE_TIMEOUT]
+  --elasitcsearch value elasitcsearch address for Malice to store results [$MALICE_ELASTICSEARCH]
   --help, -h	        show help
   --version, -v	        print the version
 
 Commands:
   update	Update virus definitions
-  web       Create a zoner scan web service  
+  web       Create a zoner scan web service
   help		Shows a list of commands or help for one command
 
 Run 'zoner COMMAND --help' for more information on a command.
@@ -59,7 +59,7 @@ This will output to stdout and POST to malice results API webhook endpoint.
 
 ## Sample Output
 
-### JSON:
+### [JSON](https://github.com/malice-plugins/zoner/blob/master/docs/results.json)
 
 ```json
 {
@@ -72,39 +72,39 @@ This will output to stdout and POST to malice results API webhook endpoint.
 }
 ```
 
-### Markdown:
+### [Markdown](https://github.com/malice-plugins/zoner/blob/master/docs/SAMPLE.md)
 
 ---
 
 #### Zoner
-| Infected      | Result      | Engine      | Updated      |
-|:-------------:|:-----------:|:-----------:|:------------:|
-| true | EICAR.Test.File-NoVirus | 1979756 | 20170707 |
+
+| Infected |         Result          | Engine  | Updated  |
+| :------: | :---------------------: | :-----: | :------: |
+|   true   | EICAR.Test.File-NoVirus | 1979756 | 20170707 |
 
 ---
 
-Documentation
--------------
+## Documentation
 
--	[To write results to ElasticSearch](https://github.com/malice-plugins/zoner/blob/master/docs/elasticsearch.md)
--	[To create a Zoner scan micro-service](https://github.com/malice-plugins/zoner/blob/master/docs/web.md)
--	[To post results to a webhook](https://github.com/malice-plugins/zoner/blob/master/docs/callback.md)
--	[To update the AV definitions](https://github.com/malice-plugins/zoner/blob/master/docs/update.md)
+- [To write results to ElasticSearch](https://github.com/malice-plugins/zoner/blob/master/docs/elasticsearch.md)
+- [To create a Zoner scan micro-service](https://github.com/malice-plugins/zoner/blob/master/docs/web.md)
+- [To post results to a webhook](https://github.com/malice-plugins/zoner/blob/master/docs/callback.md)
+- [To update the AV definitions](https://github.com/malice-plugins/zoner/blob/master/docs/update.md)
 
-### Issues
+## Issues
 
 Find a bug? Want more features? Find something missing in the documentation? Let me know! Please don't hesitate to [file an issue](https://github.com/malice-plugins/zoner/issues/new).
 
-### CHANGELOG
+## CHANGELOG
 
 See [`CHANGELOG.md`](https://github.com/malice-plugins/zoner/blob/master/CHANGELOG.md)
 
-### Contributing
+## Contributing
 
 [See all contributors on GitHub](https://github.com/malice-plugins/zoner/graphs/contributors).
 
 Please update the [CHANGELOG.md](https://github.com/malice-plugins/zoner/blob/master/CHANGELOG.md) and submit a [Pull Request on GitHub](https://help.github.com/articles/using-pull-requests/).
 
-### License
+## License
 
-MIT Copyright (c) 2016-2017 **blacktop**
+MIT Copyright (c) 2016 **blacktop**
