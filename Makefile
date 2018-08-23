@@ -7,7 +7,7 @@ VERSION=$(shell cat VERSION)
 ZONE_KEY?=$(shell cat zoner.key)
 MALWARE=tests/malware
 
-all: build size tag test test_markdown
+all: build size tag test_all
 
 .PHONY: build
 build:
@@ -27,7 +27,8 @@ tags:
 
 .PHONY: ssh
 ssh:
-	@docker run --init -it --rm -v $(PWD):/malware --entrypoint=bash $(ORG)/$(NAME):$(VERSION)
+	@docker run --init -it --rm --entrypoint=bash $(ORG)/$(NAME):$(VERSION)
+	# @docker run --init -it --rm -v $(PWD):/malware --entrypoint=bash $(ORG)/$(NAME):$(VERSION)
 
 .PHONY: tar
 tar:
@@ -62,10 +63,13 @@ endif
 
 .PHONY: malware
 malware:
-ifeq (,$(wildcard test/malware))
+ifeq (,$(wildcard $(MALWARE)))
 	wget https://github.com/maliceio/malice-av/raw/master/samples/befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408 -O $(MALWARE)
 	cd tests; echo "TEST" > not.malware
 endif
+
+.PHONY: test_all
+test_all: test test_elastic test_markdown test_web
 
 .PHONY: test
 test: malware
@@ -83,10 +87,23 @@ test_elastic: start_elasticsearch malware
 	http localhost:9200/malice/_search | jq . > docs/elastic.json
 
 .PHONY: test_markdown
-test_markdown: test_elastic
+test_markdown:
 	@echo "===> ${NAME} test_markdown"
 	# http localhost:9200/malice/_search query:=@docs/query.json | jq . > docs/elastic.json
 	cat docs/elastic.json | jq -r '.hits.hits[] ._source.plugins.${CATEGORY}.${NAME}.markdown' > docs/SAMPLE.md
+
+.PHONY: test_web
+test_web: malware stop
+	@echo "===> Starting web service"
+	@docker run -d --name $(NAME) -p 3993:3993 $(ORG)/$(NAME):$(VERSION) web
+	sleep 10; http -f localhost:3993/scan malware@$(MALWARE)
+	@echo "===> Stopping web service"
+	@docker logs $(NAME)
+	@docker rm -f $(NAME)
+
+.PHONY: stop
+stop: ## Kill running docker containers
+	@docker rm -f $(NAME) || true
 
 .PHONY: circle
 circle: ci-size
