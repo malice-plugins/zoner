@@ -39,13 +39,13 @@ gotest:
 	go test -v
 
 avtest:
-	@echo "===> ${NAME} EICAR Test"
+	@echo "\n===> ${NAME} EICAR Test"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli /malware/EICAR" > tests/av.virus || true
-	@echo "===> ${NAME} Clean Test"
+	@echo "\n===> ${NAME} Clean Test"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli /bin/cat" > tests/av.clean || true
-	@echo "===> ${NAME} Version"
+	@echo "\n===> ${NAME} Version"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version" > tests/av.version || true
-	@echo "===> ${NAME} DB version"
+	@echo "\n===> ${NAME} DB version"
 	@docker run --init --rm --entrypoint=sh $(ORG)/$(NAME):$(VERSION) -c "/etc/init.d/zavd start --no-daemon > /dev/null 2>&1 && zavcli --version-zavd" > tests/av.update || true
 
 update:
@@ -54,9 +54,9 @@ update:
 .PHONY: start_elasticsearch
 start_elasticsearch:
 ifeq ("$(shell docker inspect -f {{.State.Running}} elasticsearch)", "true")
-	@echo "===> elasticsearch already running"
+	@echo "\n===> elasticsearch already running"
 else
-	@echo "===> Starting elasticsearch"
+	@echo "\n===> Starting elasticsearch"
 	@docker rm -f elasticsearch || true
 	@docker run --init -d --name elasticsearch -p 9200:9200 malice/elasticsearch:6.3; sleep 10
 endif
@@ -73,33 +73,34 @@ test_all: test test_elastic test_markdown test_web
 
 .PHONY: test
 test: malware
-	@echo "===> ${NAME} --help"
+	@echo "\n===> ${NAME} --help"
 	docker run --init --rm $(ORG)/$(NAME):$(VERSION) --help
 	docker run --init --rm -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(MALWARE) | jq . > docs/results.json
 	cat docs/results.json | jq .
 
 .PHONY: test_elastic
 test_elastic: start_elasticsearch malware
-	@echo "===> ${NAME} test_elastic found"
+	@echo "\n===> ${NAME} test_elastic found"
 	docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH=elasticsearch -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(MALWARE)
-	# @echo "===> ${NAME} test_elastic NOT found"
+	# @echo "\n===> ${NAME} test_elastic NOT found"
 	# docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH=elasticsearch $(ORG)/$(NAME):$(VERSION) -V --api ${MALICE_VT_API} lookup $(MISSING_HASH)
 	http localhost:9200/malice/_search | jq . > docs/elastic.json
 
 .PHONY: test_markdown
 test_markdown:
-	@echo "===> ${NAME} test_markdown"
+	@echo "\n===> ${NAME} test_markdown"
 	# http localhost:9200/malice/_search query:=@docs/query.json | jq . > docs/elastic.json
 	cat docs/elastic.json | jq -r '.hits.hits[] ._source.plugins.${CATEGORY}.${NAME}.markdown' > docs/SAMPLE.md
 
 .PHONY: test_web
 test_web: malware stop
-	@echo "===> Starting web service"
-	@docker run -d --name $(NAME) -p 3993:3993 $(ORG)/$(NAME):$(VERSION) web
+	@echo "\n===> Starting web service"
+	docker run -d --name $(NAME) -p 3993:3993 $(ORG)/$(NAME):$(VERSION) web
+	sleep 10; http -f localhost:3993/scan malware@/Users/blacktop/go/src/github.com/malice-plugins/pdf/test/eicar.pdf
 	sleep 10; http -f localhost:3993/scan malware@$(MALWARE)
-	@echo "===> Stopping web service"
+	@echo "\n===> Stopping web service"
 	@docker logs $(NAME)
-	@docker rm -f $(NAME)
+	# @docker rm -f $(NAME)
 
 .PHONY: stop
 stop: ## Kill running docker containers
@@ -108,14 +109,14 @@ stop: ## Kill running docker containers
 .PHONY: circle
 circle: ci-size
 	@sed -i.bu 's/docker%20image-.*-blue/docker%20image-$(shell cat .circleci/size)-blue/' README.md
-	@echo "===> Image size is: $(shell cat .circleci/size)"
+	@echo "\n===> Image size is: $(shell cat .circleci/size)"
 
 ci-build:
-	@echo "===> Getting CircleCI build number"
+	@echo "\n===> Getting CircleCI build number"
 	@http https://circleci.com/api/v1.1/project/github/${REPO} | jq '.[0].build_num' > .circleci/build_num
 
 ci-size: ci-build
-	@echo "===> Getting artifact sizes from CircleCI"
+	@echo "\n===> Getting artifact sizes from CircleCI"
 	@cd .circleci; rm size nsrl bloom || true
 	@http https://circleci.com/api/v1.1/project/github/${REPO}/$(shell cat .circleci/build_num)/artifacts${CIRCLE_TOKEN} | jq -r ".[] | .url" | xargs wget -q -P .circleci
 
