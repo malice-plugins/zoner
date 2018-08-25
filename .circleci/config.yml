@@ -44,18 +44,30 @@ jobs:
           paths:
             - /caches/app.tar
       - run:
-          name: Download samples
+          name: Download sample
           command: |
-            docker create -v /malware --name malvol --entrypoint=sh malice/alpine /bin/true
-            docker run --rm -it --volumes-from malvol \
-             malice/get-mauled -V download --password infected https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Trojan.Regin/Trojan.Regin.zip
+            docker run --init blacktop/httpie --follow https://github.com/maliceio/malice-av/raw/master/samples/befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408 > /tmp/sample
+            docker create -v /malware --name malvol alpine:3.8 /bin/true
+            docker cp /tmp/sample malvol:/malware
       - run:
           name: Run tests
           command: |
             set -x
-            for file in $(docker run --volumes-from malvol alpine ls -1 /malware)
+            docker run --rm --volumes-from malvol app -V sample | jq .
+            docker run --rm --volumes-from malvol app -t sample
+      - run:
+          name: Download samples
+          command: |
+            docker create -v /malware --name malvol2 --entrypoint=sh malice/alpine /bin/true
+            docker run --rm -it --volumes-from malvol2 \
+             malice/get-mauled -V malware-samples
+      - run:
+          name: Run tests
+          command: |
+            set -x
+            for file in $(docker run --volumes-from malvol2 alpine ls -1 /malware)
             do
-              docker run --rm --volumes-from malvol app $file | jq .
+              docker run --rm --volumes-from malvol2 app $file | jq .
             done
       - run:
           name: Run update test
