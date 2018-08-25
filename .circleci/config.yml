@@ -48,12 +48,16 @@ jobs:
           command: |
             docker create -v /malware --name malvol --entrypoint=sh malice/alpine /bin/true
             docker run --rm -it --volumes-from malvol \
-             malice/get-mauled download --password infected https://github.com/ytisf/theZoo/blob/master/malwares/Binaries/ZeusBankingVersion_26Nov2013/ZeusBankingVersion_26Nov2013.zip
+             malice/get-mauled -V download --password infected https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Trojan.Regin/Trojan.Regin.zip
       - run:
           name: Run tests
           command: |
             set -x
-            docker run --rm --volumes-from malvol app -V 2796a119171328e91648a73d95eb297edc220e8768f4bbba5fb7237122a988fc | jq .
+            for file in $(docker run --volumes-from malvol alpine ls -1 /malware)
+            do
+              docker run --rm --volumes-from malvol app -V $file | jq .
+            done
+            docker run --rm --volumes-from malvol app -V $file | jq .
             docker run --rm --volumes-from malvol app -t 2796a119171328e91648a73d95eb297edc220e8768f4bbba5fb7237122a988fc
       - run:
           name: Run update test
