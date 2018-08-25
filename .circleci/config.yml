@@ -44,17 +44,18 @@ jobs:
           paths:
             - /caches/app.tar
       - run:
-          name: Download sample
+          name: Download samples
           command: |
-            docker run --init blacktop/httpie --follow https://github.com/maliceio/malice-av/raw/master/samples/befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408 > /tmp/sample
             docker create -v /malware --name malvol alpine:3.8 /bin/true
-            docker cp /tmp/sample malvol:/malware
+            docker run --rm -it \
+             --volumes-from malvol \
+             malice/get-mauled download --password infected https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Duqu2/Duqu2.zip
       - run:
           name: Run tests
           command: |
             set -x
-            docker run --rm --volumes-from malvol app -V sample | jq .
-            docker run --rm --volumes-from malvol app -t sample
+            docker run --rm --volumes-from malvol app -V 2796a119171328e91648a73d95eb297edc220e8768f4bbba5fb7237122a988fc | jq .
+            docker run --rm --volumes-from malvol app -t 2796a119171328e91648a73d95eb297edc220e8768f4bbba5fb7237122a988fc
       - run:
           name: Run update test
           command: |
