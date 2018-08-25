@@ -55,10 +55,8 @@ jobs:
             set -x
             for file in $(docker run --volumes-from malvol alpine ls -1 /malware)
             do
-              docker run --rm --volumes-from malvol app -V $file | jq .
+              docker run --rm --volumes-from malvol app $file | jq .
             done
-            docker run --rm --volumes-from malvol app -V $file | jq .
-            docker run --rm --volumes-from malvol app -t 2796a119171328e91648a73d95eb297edc220e8768f4bbba5fb7237122a988fc
       - run:
           name: Run update test
           command: |
