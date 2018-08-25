@@ -46,8 +46,7 @@ jobs:
       - run:
           name: Download samples
           command: |
-            docker create -v /malware --name malvol alpine:3.8 /bin/true
-            docker run --init --volumes-from malvol alpine:3.8 sh -c "chown malice: /malware"
+            docker create -v /malware --name malvol --entrypoint=sh malice/alpine /bin/true
             docker run --rm -it --volumes-from malvol \
              malice/get-mauled download --password infected https://github.com/ytisf/theZoo/raw/master/malwares/Binaries/Duqu2/Duqu2.zip
       - run:
