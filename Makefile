@@ -6,6 +6,7 @@ VERSION=$(shell cat VERSION)
 
 ZONE_KEY?=$(shell cat zoner.key)
 MALWARE=tests/malware
+NOT_MALWARE=tests/not.malware
 
 all: build size tag test_all
 
@@ -54,12 +55,11 @@ update:
 .PHONY: start_elasticsearch
 start_elasticsearch:
 ifeq ("$(shell docker inspect -f {{.State.Running}} elasticsearch)", "true")
-	@echo "\n===> elasticsearch already running"
-else
-	@echo "\n===> Starting elasticsearch"
+	@echo "===> elasticsearch already running.  Stopping now..."
 	@docker rm -f elasticsearch || true
-	@docker run --init -d --name elasticsearch -p 9200:9200 malice/elasticsearch:6.3; sleep 10
 endif
+	@echo "===> Starting elasticsearch"
+	@docker run --init -d --name elasticsearch -p 9200:9200 malice/elasticsearch:6.4; sleep 15
 
 .PHONY: malware
 malware:
@@ -73,34 +73,33 @@ test_all: test test_elastic test_markdown test_web
 
 .PHONY: test
 test: malware
-	@echo "\n===> ${NAME} --help"
+	@echo "===> ${NAME} --help"
 	docker run --init --rm $(ORG)/$(NAME):$(VERSION) --help
 	docker run --init --rm -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(MALWARE) | jq . > docs/results.json
 	cat docs/results.json | jq .
 
 .PHONY: test_elastic
 test_elastic: start_elasticsearch malware
-	@echo "\n===> ${NAME} test_elastic found"
-	docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH=elasticsearch -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(MALWARE)
-	# @echo "\n===> ${NAME} test_elastic NOT found"
-	# docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH=elasticsearch $(ORG)/$(NAME):$(VERSION) -V --api ${MALICE_VT_API} lookup $(MISSING_HASH)
+	@echo "===> ${NAME} test_elastic found"
+	docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH_URL=http://elasticsearch:9200 -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(MALWARE)
+	@echo "===> ${NAME} test_elastic NOT found"
+	docker run --rm --link elasticsearch -e MALICE_ELASTICSEARCH_URL=http://elasticsearch:9200 -v $(PWD):/malware $(ORG)/$(NAME):$(VERSION) -V $(NOT_MALWARE)
 	http localhost:9200/malice/_search | jq . > docs/elastic.json
 
 .PHONY: test_markdown
-test_markdown:
-	@echo "\n===> ${NAME} test_markdown"
+test_markdown: test_elastic
+	@echo "===> ${NAME} test_markdown"
 	# http localhost:9200/malice/_search query:=@docs/query.json | jq . > docs/elastic.json
 	cat docs/elastic.json | jq -r '.hits.hits[] ._source.plugins.${CATEGORY}.${NAME}.markdown' > docs/SAMPLE.md
 
 .PHONY: test_web
 test_web: malware stop
-	@echo "\n===> Starting web service"
-	docker run -d --name $(NAME) -p 3993:3993 $(ORG)/$(NAME):$(VERSION) web
-	sleep 10; http -f localhost:3993/scan malware@/Users/blacktop/go/src/github.com/malice-plugins/pdf/test/eicar.pdf
-	sleep 10; http -f localhost:3993/scan malware@$(MALWARE)
-	@echo "\n===> Stopping web service"
+	@echo "===> Starting web service"
+	@docker run -d --name $(NAME) -p 3993:3993 $(ORG)/$(NAME):$(VERSION) web
+	http -f localhost:3993/scan malware@$(MALWARE)
+	@echo "===> Stopping web service"
 	@docker logs $(NAME)
-	# @docker rm -f $(NAME)
+	@docker rm -f $(NAME)
 
 .PHONY: stop
 stop: ## Kill running docker containers
