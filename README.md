@@ -4,7 +4,7 @@
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://doge.mit-license.org)
 [![Docker Stars](https://img.shields.io/docker/stars/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/malice/zoner.svg)](https://hub.docker.com/r/malice/zoner/)
-[![Docker Image](https://img.shields.io/badge/docker%20image-186MB-blue.svg)](https://hub.docker.com/r/malice/zoner/)
+[![Docker Image](https://img.shields.io/badge/docker%20image-144MB-blue.svg)](https://hub.docker.com/r/malice/zoner/)
 
 > Malice [Zoner](http://www.zonerantivirus.com/stahnout) AntiVirus Plugin
 
@@ -12,7 +12,7 @@
 
 ### Dependencies
 
-- [ubuntu:xenial (_118 MB_\)](https://hub.docker.com/_/ubuntu/)
+- [ubuntu:bionic (_84.1 MB_\)](https://hub.docker.com/_/ubuntu/)
 
 ## Installation
 
