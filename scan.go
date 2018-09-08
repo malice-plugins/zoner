@@ -16,9 +16,9 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/fatih/structs"
 	"github.com/gorilla/mux"
+	"github.com/malice-plugins/pkgs/database"
 	"github.com/malice-plugins/pkgs/database/elasticsearch"
 	"github.com/malice-plugins/pkgs/utils"
-	"github.com/malice-plugins/pkgs/database"
 	"github.com/parnurzeal/gorequest"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
@@ -175,7 +175,7 @@ func getUpdatedDate() string {
 		return BuildTime
 	}
 	updated, err := ioutil.ReadFile("/opt/malice/UPDATED")
-	utils.Assert(err)
+	assert(err)
 	return string(updated)
 }
 
@@ -339,10 +339,10 @@ func main() {
 
 		if c.Args().Present() {
 			path, err = filepath.Abs(c.Args().First())
-			utils.Assert(err)
+			assert(err)
 
 			if _, err := os.Stat(path); os.IsNotExist(err) {
-				utils.Assert(err)
+				assert(err)
 			}
 
 			zoner := AvScan(c.Int("timeout"))
@@ -370,7 +370,7 @@ func main() {
 			} else {
 				zoner.Results.MarkDown = ""
 				zonerJSON, err := json.Marshal(zoner)
-				utils.Assert(err)
+				assert(err)
 				if c.Bool("post") {
 					request := gorequest.New()
 					if c.Bool("proxy") {
@@ -392,5 +392,5 @@ func main() {
 	}
 
 	err := app.Run(os.Args)
-	utils.Assert(err)
+	assert(err)
 }
