@@ -36,8 +36,9 @@ RUN buildDeps='ca-certificates wget build-essential' \
   && apt-get update -qq \
   && apt-get install -yq $buildDeps libc6-i386 \
   && echo "===> Install Zoner AV..." \
-  && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
-  && dpkg -i /tmp/zav-${ZONE}-ubuntu-amd64.deb; \
+  # && wget -q -P /tmp http://update.zonerantivirus.com/download/zav-${ZONE}-ubuntu-amd64.deb \
+  && wget --progress=bar:force -P /tmp https://github.com/maliceio/malice-av/raw/master/zoner/zav-1.3.0-debian-amd64.deb \
+  && dpkg -i /tmp/zav-${ZONE}-debian-amd64.deb; \
   if [ "x$ZONE_KEY" != "x" ]; then \
   echo "===> Updating License Key..."; \
   sed -i "s/UPDATE_KEY.*/UPDATE_KEY = ${ZONE_KEY}/g" /etc/zav/zavd.conf; \
